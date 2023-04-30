@@ -1,0 +1,126 @@
+JSON Server is an npm package that lets us create fake REST APIs with zero coding
+
+We install json server using 'npm i json-server'
+
+We must have a package.json file to access it which we can create using 'npm init -y'
+
+Then we add a script in the package.json file inside the 'scripts' object.
+
+Say we have a db.json file, we add the script "serve-json": "json-server --watch db.json" to watch the json file for when we start the server
+
+To start the server, in the terminal, we run 'npm run serve-json' or 'yarn serve-json' if we are using yarn package
+
+The server is automatically started on our localhost port 3000. To change the port, we modify the script to: "serve-json": "json-server --watch db.json --port 4000" to run on port 4000 for example
+
+                                        GET REQUEST
+
+
+                                        FETCHING DATA
+
+Now in our db.json file in this project folder, we have our products data and reviews data. To display our products data in a REST API format:
+
+On our browser, we navigate to 'localhost:3000/products'. This fetches all our products. 
+
+To fetch a single product, we add the product ID to the end of the url. For example: 'localhost:3000/products/1' for product with id of 1
+
+
+                                        FILTERING DATA
+
+We filter data by appending a query parameter '?' plus the property on our data that we want to filter.
+
+For example: say we want to filter our product category by electronics, we type: 'localhost:3000/products?category=electronics'.
+
+To filter deeply nested properties, for example the discount property in our db.json file, we type: 'localhost:3000/products?category=electronics&discount.type=shipping'
+
+
+                                        SORTING DATA
+
+We sort our data by adding a query parameter(?) followed by the '_sort' keyword and then the property name we want to sort. For example:
+
+'localhost:3000/products?_sort=price'. The default order for sorting is ascending order(from lowest to highest).
+
+If we want to sort in descending order, we use the '_order' keyword followed by 'desc', e.g: 'localhost:3000/products?_sort=price&_order=desc'
+
+We can also sort out multiple fields. For example: 'localhost:3000/products?_sort=price,category&_order=desc,asc'. Now the price is sorted in descending order and the category in ascending order
+
+
+                                        PAGINATION
+
+To paginate data, we append the keyword '?_page' in the url. By default, each page returns 10 items and we can specify the page we want to view by typing: '?page=2' for example to view page 2.
+
+'localhost:3000/products?_page=2' to view page 2.
+
+To specify the page size(number of items we want to be displayed on a page), we use the keyword: '&_limit
+
+For example, 'localhost:3000/products?_page=1&limit=2' displays 2 items on the 1st page and when we navigate to other pages subsequently displays 2 items per page.
+
+JSON server also supports pagination URLS which we can see in the response header section in network panel of our chrome browser dev tools.
+
+When we navigate to the first page in our URL, under the Headers section in dev tools, we see the url for the 1st page, next page and the last page.
+
+Similarly, when we navigate to the 2nd page, we see links for the first page, previous page, next page and last page.
+
+So when we make a request, we can access these links using 'response.headers.get' and readily use the links for pagination.
+
+
+                                        OPERATORS
+
+We can use two operators for filtering price range of the products which are: '_gte' for greater than and '_lte' for less than.
+
+For example: 'localhost:3000/products?price_gte=2000&price_lte=6000' filters products with price greater than or equal to 2000 and less than or equal to 6000 (2000 and 6000 are inclusive)
+
+Another operator is the 'not equal to' operator (ne) used to skip products with the specified property.
+
+For example, to skip the product with ID of 1: 'localhost:3000/products?id_ne=1'
+
+The 'like' operator lets us specify regex to filter data.
+
+For example, to filter products whose category starts with the letter 'f': 'localhost:3000/products?category_like=^f'.
+
+
+            
+                                        FULL TEXT SEARCH
+
+We can perform a full text search on our products data by using the keyword 'q' as a query parameter followed by the search string.
+
+For example, 'localhost:3000/products?q=in' returns all products that have the words 'in' in any of their property values.
+
+For example 'in' can be found in shipping, gardening, electronics, etc.
+
+So we use the 'like' operator when we want to filter on a particular field and the 'q' parameter for full text search on the entire data file
+
+
+
+                                        RELATIONSHIPS
+
+Let's say we want to fetch corresponding reviews for each of our products, we use the 'embed' keyword. This queries our db.json file to include children resources when fetching the data.
+
+'localhost:3000/products?_embed=reviews'. Now all reviews for a corresponding product will be attached as a new 'reviews' property.
+
+'localhost:3000/products?1_embed=reviews' to get only the first product and it's reviews
+
+It is also possible to include parent resources when querying a child resource. For example, to include the product info when querying for the reviews.
+
+We use the '_expand' keyword for this. 'localhost:3000/products?_expand=product'. 'product' has to be singular since the review can only have 1 parent
+
+
+                                        POST/PUT/PATCH/DELETE REQUESTS
+
+
+We can use ThunderClient VScode extension to perform all these requests.
+
+We make these requests using http and not https.
+
+POST request url for products would look like this: http://localhost:3000/products and then we click on 'New Request' and select request type as 'POST'.
+
+We add the new data in a json format(enclosed in curly brackets) and then click on Send button. If successful, it immediately gets displayed on our db.json file.
+
+PUT/PATCH and DELETE requests must always contain the id of the itemk in the url. e.g http://localhost:3000/2
+
+The PUT request needs the entire product object, even when modifying a single property.
+
+If we want to modify a single property, we make use of the PATCH request.
+
+If we remove all other object properties in PUT method, they all get removed when returning the modified data, but with PATCH method, they all remain.
+
+For DELETE request, we do not need to specify anything in the Body section.
